@@ -1,11 +1,13 @@
 import numpy as np
+import collections
+import copy
 
 
 class GomokuBoard:
-    def __init__(self, height=19, width=19,  row_in_line=5):
+    def __init__(self, height=19, width=19):
         self.shape = np.array([height, width])
         self.board_data = np.zeros(self.shape)
-        self.row_in_line = row_in_line
+        self.deque = collections.deque(maxlen=400)
 
     def show(self):
         print("Player1: X\tPlayer2: O")
@@ -35,7 +37,14 @@ class GomokuBoard:
         if player_value != 1 and player_value != 2:
             return False
         self.board_data[h_position, v_position] = player_value
+        self.deque.append(copy.copy(self.board_data))
         return True
+
+    def reset(self):
+        self.board_data = np.zeros(self.shape)
+        self.deque.clear()
+        for _ in range(10):
+            self.deque.append(copy(self.board_data))
 
 
 if __name__ == "__main__":
