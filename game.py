@@ -57,15 +57,19 @@ class GomokuGame:
 
 
 if __name__ == "__main__":
-    game = GomokuGame(9, 9, 4)
+    game = GomokuGame()
     for e in range(300):
         player = game.whose_term()
-        h = random.randint(0, game.shape[0] - 1)
-        v = random.randint(0, game.shape[1] - 1)
+        position = random.choice(game.gomoku_board.valid_position)
+        h = int(position / game.shape[1])
+        v = position - h * game.shape[1]
         ret = game.step(player, h, v)
         if ret:
-            game.gomoku_board.show()
-            time.sleep(1)
+            game.gomoku_board.show(show_pic=True)
+            # time.sleep(1)
+        else:
+            print("Position {},{} is not valid".format(h, v))
+            break
         winner = game.has_winner()
         if winner != 0:
             print("Player{} Win in {}!!!".format(winner, e))
