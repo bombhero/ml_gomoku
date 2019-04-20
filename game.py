@@ -66,7 +66,7 @@ if __name__ == "__main__":
         ret = game.step(player, h, v)
         if ret:
             game.gomoku_board.show(show_pic=True)
-            # time.sleep(1)
+            # time.sleep(10)
         else:
             print("Position {},{} is not valid".format(h, v))
             break
@@ -77,4 +77,5 @@ if __name__ == "__main__":
             print(len(game.gomoku_board.deque))
             last_step = game.gomoku_board.deque[1]
             break
+    time.sleep(30)
 

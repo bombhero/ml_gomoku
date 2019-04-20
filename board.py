@@ -42,15 +42,14 @@ class GomokuBoard:
             for j in range(self.shape[1]):
                 plt.plot([j, j], [0, self.shape[0] - 1], "b-")
             self.base_show = True
-        for i in range(self.shape[0]):
-            for j in range(self.shape[1]):
-                if self.board_data[i, j] == 1:
-                    plt.plot([j], [i],  "ko")
-                if self.board_data[i, j] == 2:
-                    plt.plot([j], i, "yo")
+        if self.last_step != [-1, -1]:
+            if self.board_data[self.last_step[0], self.last_step[1]] == 1:
+                plt.plot([self.last_step[1]], [self.last_step[0]], "ko")
+            if self.board_data[self.last_step[0], self.last_step[1]] == 2:
+                plt.plot([self.last_step[1]], [self.last_step[0]], "yo")
         plt.ion()
         plt.show()
-        plt.pause(0.1)
+        plt.pause(0.01)
 
     def set_value(self, h_position, v_position, player_value):
         position = h_position * self.shape[1] + v_position
