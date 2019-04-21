@@ -1,5 +1,5 @@
 from board import GomokuBoard
-from random_player import GomokuPlayer
+from mcts_player import GomokuPlayer
 import random
 import time
 

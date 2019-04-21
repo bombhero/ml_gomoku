@@ -31,6 +31,12 @@ class MCTSTreeNode:
         self._u = c_put * self._possible * np.sqrt(self._parent._n_visit) / (1 + self._n_visit)
         return self._Q + self._u
 
+    def expand(self, action_possible):
+        for action, possible in action_possible:
+            if action not in self._child:
+                self._child[action] = MCTSTreeNode(self, possible)
+        pass
+
     def is_leaf(self):
         if len(self._child) == 0:
             return True
@@ -43,23 +49,26 @@ class MCTSPure:
         self._root = MCTSTreeNode(None, 1.0)
         self._n_playout = n_playout
         self._c_put = c_put
+        self._policy = policy_value_fn
 
     def _playout(self, game):
         node = self._root
         while True:
             if node.is_leaf():
                 break
-            action = node.select(self._c_put)
+            action, node = node.select(self._c_put)
             game.do_move(action)
 
-        winner = game.has_winer()
+        winner = game.has_winner()
         if winner == 0:
-
+            action_possible = self._policy(game)
+            node.expand(action_possible)
 
     def get_move(self, game):
         for _ in range(self._n_playout):
             game_copy = copy.deepcopy(game)
             self._playout(game_copy)
+        print("Get move done.")
 
 
 class GomokuPlayer:
