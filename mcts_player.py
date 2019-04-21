@@ -1,5 +1,18 @@
 import random
 import numpy as np
+import copy
+
+
+def rollout_value_fn(game):
+    action_n = game.gomoku_board.valid_position
+    action_possible = np.random.rand(len(action_n))
+    return zip(action_n, action_possible)
+
+
+def policy_value_fn(game):
+    action_n = game.gomoku_board.valid_position
+    action_possible = np.ones(len(action_n)) / len(action_n)
+    return zip(action_n, action_possible)
 
 
 class MCTSTreeNode:
@@ -18,10 +31,35 @@ class MCTSTreeNode:
         self._u = c_put * self._possible * np.sqrt(self._parent._n_visit) / (1 + self._n_visit)
         return self._Q + self._u
 
+    def is_leaf(self):
+        if len(self._child) == 0:
+            return True
+        else:
+            return False
+
 
 class MCTSPure:
-    def __init__(self):
+    def __init__(self, c_put=5, n_playout=100):
         self._root = MCTSTreeNode(None, 1.0)
+        self._n_playout = n_playout
+        self._c_put = c_put
+
+    def _playout(self, game):
+        node = self._root
+        while True:
+            if node.is_leaf():
+                break
+            action = node.select(self._c_put)
+            game.do_move(action)
+
+        winner = game.has_winer()
+        if winner == 0:
+
+
+    def get_move(self, game):
+        for _ in range(self._n_playout):
+            game_copy = copy.deepcopy(game)
+            self._playout(game_copy)
 
 
 class GomokuPlayer:
@@ -29,10 +67,8 @@ class GomokuPlayer:
         self.player_id = player_id
         self.mcts = MCTSPure()
 
-    def get_action(self, board):
-        if board.last_step[0] == -1:
-            pass
-        elif board.board_data[board.last_step[0], board.last_step[1]] == self.player_id:
-            return
+    def get_action(self, game):
+        if game.whose_term() != self.player_id:
+            return -1
 
-        return random.choice(board.valid_position)
+        return self.mcts.get_move(game)

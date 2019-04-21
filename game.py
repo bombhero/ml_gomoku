@@ -27,6 +27,11 @@ class GomokuGame:
             self.term_owner = 1
         return ret
 
+    def do_move(self, position, is_show=False):
+        h = int(position / self.shape[1])
+        v = position - h * self.shape[1]
+        self.step(self.whose_term(), h, v, is_show)
+
     def whose_term(self):
         if self.term_owner == 0:
             self.term_owner = random.randint(1, 2)
@@ -57,19 +62,19 @@ class GomokuGame:
         return winner
 
 
-if __name__ == "__main__":
+def run():
     game = GomokuGame()
     player = []
-    for id in [1, 2]:
-        player.append(GomokuPlayer(id))
+    for player_id in [1, 2]:
+        player.append(GomokuPlayer(player_id))
     for r in range(5):
         game.gomoku_board.reset()
         for e in range(300):
             player_id = game.whose_term()
             if player[0].player_id == player_id:
-                position = player[0].get_action(game.gomoku_board)
+                position = player[0].get_action(game)
             else:
-                position = player[1].get_action(game.gomoku_board)
+                position = player[1].get_action(game)
             h = int(position / game.shape[1])
             v = position - h * game.shape[1]
             ret = game.step(player_id, h, v)
@@ -85,3 +90,6 @@ if __name__ == "__main__":
                 print("h={}, v={}.".format(h+1, v+1))
                 break
 
+
+if __name__ == "__main__":
+    run()
