@@ -1,4 +1,5 @@
 from board import GomokuBoard
+from random_player import GomokuPlayer
 import random
 import time
 
@@ -58,24 +59,29 @@ class GomokuGame:
 
 if __name__ == "__main__":
     game = GomokuGame()
-    for e in range(300):
-        player = game.whose_term()
-        position = random.choice(game.gomoku_board.valid_position)
-        h = int(position / game.shape[1])
-        v = position - h * game.shape[1]
-        ret = game.step(player, h, v)
-        if ret:
-            game.gomoku_board.show(show_pic=True)
-            # time.sleep(10)
-        else:
-            print("Position {},{} is not valid".format(h, v))
-            break
-        winner = game.has_winner()
-        if winner != 0:
-            print("Player{} Win in {}!!!".format(winner, e))
-            print("h={}, v={}.".format(h+1, v+1))
-            print(len(game.gomoku_board.deque))
-            last_step = game.gomoku_board.deque[1]
-            break
-    time.sleep(30)
+    player = []
+    for id in [1, 2]:
+        player.append(GomokuPlayer(id))
+    for r in range(5):
+        game.gomoku_board.reset()
+        for e in range(300):
+            player_id = game.whose_term()
+            if player[0].player_id == player_id:
+                position = player[0].get_action(game.gomoku_board)
+            else:
+                position = player[1].get_action(game.gomoku_board)
+            h = int(position / game.shape[1])
+            v = position - h * game.shape[1]
+            ret = game.step(player_id, h, v)
+            if ret:
+                game.gomoku_board.show(show_pic=True)
+                # time.sleep(10)
+            else:
+                print("Position {},{} is not valid".format(h, v))
+                break
+            winner = game.has_winner()
+            if winner != 0:
+                print("Player{} Win in {}!!!".format(winner, e))
+                print("h={}, v={}.".format(h+1, v+1))
+                break
 

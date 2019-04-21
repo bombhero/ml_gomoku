@@ -8,7 +8,6 @@ class GomokuBoard:
     def __init__(self, height=19, width=19):
         self.shape = np.array([height, width])
         self.board_data = np.zeros(self.shape)
-        self.deque = collections.deque(maxlen=400)
         self.last_step = [-1, -1]
         self.base_show = False
         self.valid_position = list(range(height * width))
@@ -37,16 +36,17 @@ class GomokuBoard:
 
     def show_pic(self):
         if not self.base_show:
+            plt.clf()
             for i in range(self.shape[0]):
-                plt.plot([0, self.shape[1] - 1], [i, i], "b-")
+                plt.plot([0, self.shape[1] - 1], [i, i], "k-")
             for j in range(self.shape[1]):
-                plt.plot([j, j], [0, self.shape[0] - 1], "b-")
+                plt.plot([j, j], [0, self.shape[0] - 1], "k-")
             self.base_show = True
         if self.last_step != [-1, -1]:
             if self.board_data[self.last_step[0], self.last_step[1]] == 1:
-                plt.plot([self.last_step[1]], [self.last_step[0]], "ko")
+                plt.plot([self.last_step[1]], [self.last_step[0]], "bo")
             if self.board_data[self.last_step[0], self.last_step[1]] == 2:
-                plt.plot([self.last_step[1]], [self.last_step[0]], "yo")
+                plt.plot([self.last_step[1]], [self.last_step[0]], "mo")
         plt.ion()
         plt.show()
         plt.pause(0.01)
@@ -60,14 +60,13 @@ class GomokuBoard:
         self.board_data[h_position, v_position] = player_value
         self.last_step = [h_position, v_position]
         self.valid_position.remove(position)
-        self.deque.append(copy.copy(self.board_data))
         return True
 
     def reset(self, ):
         self.board_data = np.zeros(self.shape)
-        self.deque.clear()
-        for _ in range(10):
-            self.deque.append(copy(self.board_data))
+        self.last_step = [-1, -1]
+        self.base_show = False
+        self.valid_position = list(range(self.shape[0] * self.shape[1]))
 
 
 if __name__ == "__main__":
