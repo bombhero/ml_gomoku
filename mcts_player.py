@@ -50,6 +50,7 @@ class MCTSPure:
         self._n_playout = n_playout
         self._c_put = c_put
         self._policy = policy_value_fn
+        self._rollout = rollout_value_fn
 
     def _playout(self, game):
         node = self._root
@@ -59,10 +60,26 @@ class MCTSPure:
             action, node = node.select(self._c_put)
             game.do_move(action)
 
-        winner = game.has_winner()
+        game_end, winner = game.game_end()
         if winner == 0:
             action_possible = self._policy(game)
             node.expand(action_possible)
+        leaf_value = self._evaluate_rollout(game)
+        pass
+
+    def _evaluate_rollout(self, game, limit=400):
+        current_player = game.whose_term()
+        for i in range(limit):
+            game_end, winner = game.game_end()
+            if game_end:
+                break
+            action_possible = self._rollout(game)
+            max_action = max(action_possible, key=lambda action:action[1])[0]
+            game.do_move(max_action)
+        if winner == 0:
+            return 0
+        else:
+            return 1 if winner == current_player else -1
 
     def get_move(self, game):
         for _ in range(self._n_playout):

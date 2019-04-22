@@ -37,8 +37,9 @@ class GomokuGame:
             self.term_owner = random.randint(1, 2)
         return self.term_owner
 
-    def has_winner(self):
+    def game_end(self):
         winner = 0
+        game_end = False
         for i in range(self.gomoku_board.shape[0] - self.row_in_line):
             for j in range(self.gomoku_board.shape[1] - self.row_in_line):
                 hold_value = self.gomoku_board.board_data[i, j]
@@ -58,8 +59,11 @@ class GomokuGame:
                     if might_winner[row]:
                         winner = hold_value
                 if winner != 0:
-                    return winner
-        return winner
+                    game_end = True
+                    break
+            if game_end:
+                break
+        return game_end, winner
 
 
 def run():
@@ -84,10 +88,15 @@ def run():
             else:
                 print("Position {},{} is not valid".format(h, v))
                 break
-            winner = game.has_winner()
-            if winner != 0:
-                print("Player{} Win in {}!!!".format(winner, e))
-                print("h={}, v={}.".format(h+1, v+1))
+            game_end, winner = game.game_end()
+            if game_end:
+                if winner != 0:
+                    print("Player{} Win in {}!!!".format(winner, e))
+                    print("h={}, v={}.".format(h+1, v+1))
+                else:
+                    print("No winner, board is full!!!")
+
+                time.sleep(10)
                 break
 
 
