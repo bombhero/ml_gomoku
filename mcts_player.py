@@ -37,6 +37,15 @@ class MCTSTreeNode:
                 self._child[action] = MCTSTreeNode(self, possible)
         pass
 
+    def update(self, reward):
+        self._n_visit += 1
+        self._Q
+
+    def recursive_update(self, reward):
+        if self._parent:
+            self._parent.recursive_update(reward)
+        self.update(reward)
+
     def is_leaf(self):
         if len(self._child) == 0:
             return True

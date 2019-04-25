@@ -67,7 +67,7 @@ class GomokuGame:
 
 
 def run():
-    game = GomokuGame()
+    game = GomokuGame(height=6,width=6, row_in_line=4)
     player = []
     for player_id in [1, 2]:
         player.append(GomokuPlayer(player_id))
