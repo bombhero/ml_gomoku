@@ -1,5 +1,5 @@
 from board import GomokuBoard
-from mcts_player import GomokuPlayer
+from mctstree_player import GomokuPlayer
 import random
 import time
 
@@ -40,29 +40,34 @@ class GomokuGame:
     def game_end(self):
         winner = 0
         game_end = False
-        for i in range(self.gomoku_board.shape[0] - self.row_in_line):
-            for j in range(self.gomoku_board.shape[1] - self.row_in_line):
+
+        # The board id full
+        if len(self.gomoku_board.valid_position) == 0:
+            return True, 0
+
+        for i in range(self.gomoku_board.shape[0]):
+            for j in range(self.gomoku_board.shape[1]):
                 hold_value = self.gomoku_board.board_data[i, j]
                 if hold_value == 0:
                     continue
-                might_winner = [True, True, True]
-                for row in range(1, self.row_in_line):
-                    if self.gomoku_board.board_data[i + row, j] != hold_value:
-                        might_winner[0] = False
-                    if self.gomoku_board.board_data[i + row, j + row] != hold_value:
-                        might_winner[1] = False
-                    if self.gomoku_board.board_data[i, j + row] != hold_value:
-                        might_winner[2] = False
-                    if might_winner == [False, False, False]:
+                might_win = [True, True, True]
+                for row in range(self.row_in_line):
+                    if i + row >= self.gomoku_board.shape[0] or hold_value != self.gomoku_board.board_data[i+row, j]:
+                        might_win[0] = False
                         break
-                for row in range(3):
-                    if might_winner[row]:
-                        winner = hold_value
-                if winner != 0:
+                for row in range(self.row_in_line):
+                    if j + row >= self.gomoku_board.shape[1] or hold_value != self.gomoku_board.board_data[i, j+row]:
+                        might_win[1] = False
+                        break
+                for row in range(self.row_in_line):
+                    if i + row >= self.gomoku_board.shape[0] or j + row >= self.gomoku_board.shape[1] \
+                            or hold_value != self.gomoku_board.board_data[i+row, j+row]:
+                        might_win[2] = False
+                        break
+                if might_win != [False, False, False]:
                     game_end = True
-                    break
-            if game_end:
-                break
+                    winner = hold_value
+
         return game_end, winner
 
 
@@ -83,7 +88,7 @@ def run():
             v = position - h * game.shape[1]
             ret = game.step(player_id, h, v)
             if ret:
-                game.gomoku_board.show(show_pic=True)
+                game.gomoku_board.show(show_pic=False)
                 # time.sleep(10)
             else:
                 print("Position {},{} is not valid".format(h, v))
@@ -96,7 +101,7 @@ def run():
                 else:
                     print("No winner, board is full!!!")
 
-                time.sleep(10)
+                time.sleep(30)
                 break
 
 
