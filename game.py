@@ -72,7 +72,7 @@ class GomokuGame:
 
 
 def run():
-    game = GomokuGame(height=6,width=6, row_in_line=4)
+    game = GomokuGame(height=15, width=15, row_in_line=5)
     player = []
     for player_id in [1, 2]:
         player.append(GomokuPlayer(player_id))
@@ -88,7 +88,7 @@ def run():
             v = position - h * game.shape[1]
             ret = game.step(player_id, h, v)
             if ret:
-                game.gomoku_board.show(show_pic=False)
+                game.gomoku_board.show(show_pic=True)
                 # time.sleep(10)
             else:
                 print("Position {},{} is not valid".format(h, v))
