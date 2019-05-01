@@ -89,7 +89,7 @@ def run():
             ret = game.step(player_id, h, v)
             if ret:
                 game.gomoku_board.show(show_pic=True)
-                # time.sleep(10)
+                time.sleep(0.1)
             else:
                 print("Position {},{} is not valid".format(h, v))
                 break

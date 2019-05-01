@@ -21,23 +21,27 @@ class TreeNode:
         self._n_reward = 0
         self._game_copy = game
         self._children = {}
+        self._Q = 0.0
+        self._u = 0.0
 
-    def select(self):
+    def select(self, c_put):
         if len(self._children) == 0:
             return None
         else:
-            return max(self._children.items(), key=lambda act_node: act_node[1].get_value())
+            return max(self._children.items(), key=lambda act_node: act_node[1].get_value(c_put))
 
     def expand(self, action_priors):
         for action_n, prob in action_priors:
             if action_n not in self._children:
                 self._children[action_n] = TreeNode(self, action_n)
 
-    def get_value(self):
-        if self._n_visit == 0:
+    def get_value(self, c_put):
+        if (self._n_visit == 0) or (not self._parent):
             return 1.0
         else:
-            return float(self._n_reward) / float(self._n_visit)
+            self._Q = float(self._n_reward) / float(self._n_visit)
+            self._u = c_put * np.sqrt(np.log(self._parent._n_visit)/self._n_visit)
+            return self._Q + self._u
 
     def update_value(self, reward):
         self._n_visit += 1
@@ -56,18 +60,19 @@ class TreeNode:
 
 
 class MCTS:
-    def __init__(self, n_playout=1000):
+    def __init__(self, n_playout=1000, c_put=0.5):
         self._root = TreeNode(None, -1)
         self._n_playout = n_playout
         self._policy = policy_value_fn
         self._rollout = rollout_policy_fn
+        self._c_put = c_put
 
     def _playout(self, game):
         node = self._root
         while True:
             if node.is_leaf():
                 break
-            action_n, node = node.select()
+            action_n, node = node.select(self._c_put)
             game.do_move(action_n)
 
         game_end, winner = game.game_end()
@@ -98,7 +103,7 @@ class MCTS:
         for _ in range(self._n_playout):
             game_copy = copy.deepcopy(game)
             self._playout(game_copy)
-        action_n, node = self._root.select()
+        action_n, node = self._root.select(self._c_put)
         return action_n
 
     def remove_one_child(self, last_move):
