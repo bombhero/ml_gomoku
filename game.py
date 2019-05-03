@@ -1,5 +1,7 @@
 from board import GomokuBoard
-from mctstree_player import GomokuPlayer
+from mctstree_player import GomokuPlayer as MctsPlayer
+from random_player import GomokuPlayer as RandomPlayer
+from human_player import GomokuPlayer as HumanPlayer
 import random
 import time
 
@@ -50,7 +52,7 @@ class GomokuGame:
                 hold_value = self.gomoku_board.board_data[i, j]
                 if hold_value == 0:
                     continue
-                might_win = [True, True, True]
+                might_win = [True, True, True, True]
                 for row in range(self.row_in_line):
                     if i + row >= self.gomoku_board.shape[0] or hold_value != self.gomoku_board.board_data[i+row, j]:
                         might_win[0] = False
@@ -64,20 +66,31 @@ class GomokuGame:
                             or hold_value != self.gomoku_board.board_data[i+row, j+row]:
                         might_win[2] = False
                         break
-                if might_win != [False, False, False]:
+                for row in range(self.row_in_line):
+                    if i + row >= self.gomoku_board.shape[0] or j - row < 0 \
+                            or hold_value != self.gomoku_board.board_data[i+row, j-row]:
+                        might_win[3] = False
+                        break
+                if might_win != [False, False, False, False]:
                     game_end = True
                     winner = hold_value
 
         return game_end, winner
 
+    def reset(self):
+        self.gomoku_board.reset()
+        self.term_owner = 0
+
 
 def run():
-    game = GomokuGame(height=15, width=15, row_in_line=5)
+    game = GomokuGame(height=9, width=9, row_in_line=5)
     player = []
-    for player_id in [1, 2]:
-        player.append(GomokuPlayer(player_id))
+    # for player_id in [1, 2]:
+    #     player.append(GomokuPlayer(player_id))
+    player.append(HumanPlayer(1))
+    player.append(MctsPlayer(2))
     for r in range(5):
-        game.gomoku_board.reset()
+        game.reset()
         for e in range(300):
             player_id = game.whose_term()
             if player[0].player_id == player_id:
@@ -88,7 +101,7 @@ def run():
             v = position - h * game.shape[1]
             ret = game.step(player_id, h, v)
             if ret:
-                game.gomoku_board.show(show_pic=True)
+                game.gomoku_board.show(show_pic=False)
                 time.sleep(0.1)
             else:
                 print("Position {},{} is not valid".format(h, v))
@@ -96,7 +109,7 @@ def run():
             game_end, winner = game.game_end()
             if game_end:
                 if winner != 0:
-                    print("Player{} Win in {}!!!".format(winner, e))
+                    print("Player {}({}) Win in {}!!!".format(int(winner), player[int(winner) - 1].__str__(), e))
                     print("h={}, v={}.".format(h+1, v+1))
                 else:
                     print("No winner, board is full!!!")

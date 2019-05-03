@@ -1,6 +1,7 @@
 import random
 import copy
 import numpy as np
+import time
 
 
 def policy_value_fn(game):
@@ -60,7 +61,7 @@ class TreeNode:
 
 
 class MCTS:
-    def __init__(self, n_playout=1000, c_put=0.5):
+    def __init__(self, n_playout=10000, c_put=0.1):
         self._root = TreeNode(None, -1)
         self._n_playout = n_playout
         self._policy = policy_value_fn
@@ -128,9 +129,12 @@ class GomokuPlayer:
         if len(game.gomoku_board.valid_position) == 0:
             return -1
 
+        start_ts = time.time()
         move = self.mcts.get_move(game)
         self.mcts.remove_one_child(-1)
+        end_ts = time.time()
+        print("{} spend {} second.".format(self.__str__(), int(end_ts - start_ts)))
         return move
 
     def __str__(self):
-        return "GomokuPlayer"
+        return "MctsPlayer"

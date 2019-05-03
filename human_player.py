@@ -1,6 +1,3 @@
-import random
-
-
 class GomokuPlayer:
     def __init__(self, player_id):
         self.player_id = player_id
@@ -9,7 +6,10 @@ class GomokuPlayer:
         if game.whose_term() != self.player_id:
             return -1
 
-        return random.choice(game.gomoku_board.valid_position)
+        position = input("Input position(h, v): ").split(",")
+        h = int(position[0])
+        v = int(position[1])
+        return game.gomoku_board.shape[1] * (h - 1) + (v - 1)
 
     def __str__(self):
-        return "RandomPlayer"
+        return "HumanPlayer"
